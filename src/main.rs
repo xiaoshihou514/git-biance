@@ -1,5 +1,6 @@
 mod commit;
 mod data;
+mod stat;
 
 use std::{collections::HashMap, path::PathBuf};
 

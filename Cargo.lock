@@ -121,6 +121,7 @@ name = "git-biance"
 version = "0.1.0"
 dependencies = [
  "clap",
+ "once_cell",
  "regex",
  "time",
 ]
