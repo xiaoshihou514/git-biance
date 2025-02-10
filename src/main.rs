@@ -1,11 +1,14 @@
 mod commit;
 mod data;
+mod file;
 mod stat;
 
 use std::{collections::HashMap, path::PathBuf};
 
 use clap::Parser;
 use commit::get_commits;
+use file::get_file_stats;
+use stat::print_stats;
 
 use crate::{data::Author, stat::get_stats};
 
@@ -69,46 +72,11 @@ fn main() {
         }
     } else if args.stat {
         let stats = get_stats().expect("git log parsed successfully");
-        // count commits
-        let mut changes: HashMap<Author, (i64, i64)> = HashMap::new();
-        for c in stats.into_iter() {
-            let author = c.commit.author;
-            let count = changes
-                .get(&author)
-                .map(|s| {
-                    let (i, d) = s;
-                    (i + c.insertions, d + c.deletions)
-                })
-                .unwrap_or((c.insertions, c.deletions));
-            changes.insert(author, count);
-        }
-        let stats_sorted: Vec<(&Author, &(i64, i64))> = match args.author {
-            Some(a) => Vec::from(
-                changes
-                    .iter()
-                    .filter(|x| x.to_owned().0.to_owned().name.eq(&a))
-                    .collect::<Vec<_>>(),
-            ),
-            None => {
-                let mut stats = Vec::from_iter(changes.iter());
-                stats.sort_by(|a1, a2| a2.1.cmp(a1.1));
-                stats
-            }
-        };
-
-        println!(
-            "{0: <30} | {1: <12} | {2: <12}",
-            "Author", "Insertions", "Deletions"
-        );
-        for (author, (insertions, deletions)) in stats_sorted {
-            println!(
-                "{0: <30} | \u{1B}[92m{1: <12}\u{1B}[0m | \u{1B}[31m{2: <12}\u{1B}[0m",
-                author.name,
-                insertions.to_string() + "+",
-                deletions.to_string() + "-",
-            );
-        }
-    } else if let Some(_) = args.file {
-        todo!()
+        print_stats(stats, args.author);
+    } else if let Some(path) = args.file {
+        let path_str = path.into_os_string().into_string().unwrap();
+        println!("{}", path_str);
+        let stats = get_file_stats(path_str).expect("git log parsed successfully");
+        print_stats(stats, args.author);
     }
 }
