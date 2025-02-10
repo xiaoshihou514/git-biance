@@ -3,19 +3,19 @@ mod data;
 mod file;
 mod stat;
 
-use std::{collections::HashMap, path::PathBuf};
-
+use crate::commit::{get_commits, print_commit, print_commit_data};
+use crate::file::get_file_stats;
+use crate::stat::{get_stats, print_stats, print_stats_data};
 use clap::Parser;
-use commit::get_commits;
-use file::get_file_stats;
-use stat::print_stats;
-
-use crate::{data::Author, stat::get_stats};
+use std::path::PathBuf;
 
 #[derive(Parser)]
 #[command(version, about, long_about = None)]
 #[command(arg_required_else_help(true))]
 struct Cli {
+    /// Specify certain author
+    author: Option<String>,
+
     /// Show total insertions and deletions
     #[arg(short, long)]
     stat: bool,
@@ -28,10 +28,6 @@ struct Cli {
     #[arg(short, long)]
     gnuplot: bool,
 
-    /// Specify certain author
-    #[arg(short, long, value_name = "AURTHOR")]
-    author: Option<String>,
-
     /// Show insertions and deletions on single file
     #[arg(short, long, value_delimiter = ' ', num_args = 1.., value_name = "FILE")]
     file: Vec<PathBuf>,
@@ -41,38 +37,19 @@ fn main() {
     let args = Cli::parse();
 
     if args.commits {
-        let commits = get_commits().expect("git log parsed successfully");
-        // count commits
-        let mut stats: HashMap<Author, i64> = HashMap::new();
-        for c in commits.into_iter() {
-            let author = c.author;
-            let count = stats.get(&author).map(|i| i.to_owned() + 1).unwrap_or(1);
-            stats.insert(author, count);
-        }
-        let stats_sorted: Vec<(&Author, &i64)> = match args.author {
-            Some(a) => Vec::from(
-                stats
-                    .iter()
-                    .filter(|x| x.to_owned().0.to_owned().name.eq(&a))
-                    .collect::<Vec<_>>(),
-            ),
-            None => {
-                let mut stats = Vec::from_iter(stats.iter());
-                stats.sort_by(|a1, a2| a2.1.cmp(a1.1));
-                stats
-            }
-        };
-
-        println!("{0: <30} | {1: <30}", "Author", "Commits");
-        for (author, commit_count) in stats_sorted {
-            println!(
-                "{0: <30} | \u{1B}[94m{1: <30}\u{1B}[0m",
-                author.name, commit_count
-            );
+        let commits = get_commits().expect("git log parse failed");
+        if args.gnuplot {
+            print_commit_data(commits, args.author);
+        } else {
+            print_commit(commits, args.author);
         }
     } else if args.stat {
-        let stats = get_stats().expect("git log parsed successfully");
-        print_stats(stats, args.author);
+        let stats = get_stats().expect("git log parse failed");
+        if args.gnuplot {
+            print_stats_data(stats, args.author);
+        } else {
+            print_stats(stats, args.author);
+        }
     } else if !args.file.is_empty() {
         let paths: Vec<String> = args
             .file
@@ -81,9 +58,14 @@ fn main() {
             .collect();
         let mut stats = vec![];
         for file in paths {
-            let mut single = get_file_stats(file).expect("git log parsed successfully");
+            let mut single = get_file_stats(file).expect("git log parse failed");
             stats.append(&mut single);
         }
-        print_stats(stats, args.author);
+
+        if args.gnuplot {
+            print_stats_data(stats, args.author);
+        } else {
+            print_stats(stats, args.author);
+        }
     }
 }

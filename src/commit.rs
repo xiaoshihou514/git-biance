@@ -1,6 +1,6 @@
 use once_cell::sync::Lazy;
 use regex::Regex;
-use std::{process::Command, str::Lines};
+use std::{collections::HashMap, process::Command, str::Lines};
 use time::OffsetDateTime;
 
 use crate::data::{Author, Commit};
@@ -65,4 +65,51 @@ pub fn expect_commit(iter: &mut Lines) -> Option<Commit> {
         },
         time: OffsetDateTime::from_unix_timestamp(date_match).unwrap(),
     });
+}
+
+pub fn print_commit(commits: Vec<Commit>, author: Option<String>) {
+    // count commits
+    let mut stats: HashMap<Author, i64> = HashMap::new();
+    for c in commits.into_iter() {
+        let author = c.author;
+        let count = stats.get(&author).map(|i| i.to_owned() + 1).unwrap_or(1);
+        stats.insert(author, count);
+    }
+    let stats_sorted: Vec<(&Author, &i64)> = match author {
+        Some(a) => Vec::from(
+            stats
+                .iter()
+                .filter(|x| x.to_owned().0.to_owned().name.eq(&a))
+                .collect::<Vec<_>>(),
+        ),
+        None => {
+            let mut stats = Vec::from_iter(stats.iter());
+            stats.sort_by(|a1, a2| a2.1.cmp(a1.1));
+            stats
+        }
+    };
+
+    println!("{0: <30} | {1: <30}", "Author", "Commits");
+    for (author, commit_count) in stats_sorted {
+        println!(
+            "{0: <30} | \u{1B}[94m{1: <30}\u{1B}[0m",
+            author.name, commit_count
+        );
+    }
+}
+
+pub fn print_commit_data(commits: Vec<Commit>, author: Option<String>) {
+    // don't fully understand this part
+    let shown_commits: Box<dyn Iterator<Item = &Commit>> = author
+        .map_or(Box::new(commits.iter()), |name| {
+            Box::new(commits.iter().filter(move |c| c.author.name.eq(&name)))
+        });
+
+    for c in shown_commits {
+        let commit = c.to_owned();
+        println!(
+            "{},{},{}",
+            commit.time, commit.author.name, commit.author.email
+        );
+    }
 }
