@@ -33,8 +33,8 @@ struct Cli {
     author: Option<String>,
 
     /// Show insertions and deletions on single file
-    #[arg(short, long, value_name = "FILE")]
-    file: Option<PathBuf>,
+    #[arg(short, long, value_delimiter = ' ', num_args = 1.., value_name = "FILE")]
+    file: Vec<PathBuf>,
 }
 
 fn main() {
@@ -73,10 +73,17 @@ fn main() {
     } else if args.stat {
         let stats = get_stats().expect("git log parsed successfully");
         print_stats(stats, args.author);
-    } else if let Some(path) = args.file {
-        let path_str = path.into_os_string().into_string().unwrap();
-        println!("{}", path_str);
-        let stats = get_file_stats(path_str).expect("git log parsed successfully");
+    } else if !args.file.is_empty() {
+        let paths: Vec<String> = args
+            .file
+            .iter()
+            .map(|x| x.to_owned().into_os_string().into_string().unwrap())
+            .collect();
+        let mut stats = vec![];
+        for file in paths {
+            let mut single = get_file_stats(file).expect("git log parsed successfully");
+            stats.append(&mut single);
+        }
         print_stats(stats, args.author);
     }
 }
