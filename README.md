@@ -1,6 +1,6 @@
 # git-biance
 
-biance（鞭策，spur）shows total number of commits and insertions / deletions in a git repository.
+biance（鞭策，biān cè，spur）shows and visualizes code contributions in a git repository.
 
 ## Usage
 

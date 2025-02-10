@@ -1,5 +1,6 @@
 use time::OffsetDateTime;
 
+#[derive(Hash, Eq, PartialEq)]
 pub struct Author {
     pub name: String,
     pub email: String,

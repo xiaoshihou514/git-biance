@@ -37,7 +37,7 @@ pub fn get_commits() -> Option<Vec<Commit>> {
 pub fn expect_commit(iter: &mut Lines) -> Option<Commit> {
     static AUTHOR_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r"^Author: (.*?)$").unwrap());
     static EMAIL_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r"^<(.+@.+)>$").unwrap());
-    static DATE_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r"^Date:\s*([0-9]+)$").unwrap());
+    static DATE_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r"^Date:\s*(\d+)$").unwrap());
     static MERGE_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r"^Merge: .*$").unwrap());
 
     // the amount of ugly unwraps here is exactly what I want
