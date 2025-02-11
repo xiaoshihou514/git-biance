@@ -8,6 +8,12 @@ biance（鞭策，biān cè，spur）is a small rust program that shows and visu
 | :---------------------------------------------------------------------------------------: | :-----------------------------------------------------------------------------------------: |
 | ![stats](https://github.com/user-attachments/assets/23c69509-fd12-42bc-8b46-9aa9ffe08543) | ![commits](https://github.com/user-attachments/assets/6fdcb9cd-44aa-4918-b8dd-6d3a27b850bd) |
 
+## Installation
+
+```shell
+cargo install git-biance
+```
+
 ## Usage
 
 ```
