@@ -60,8 +60,16 @@ pub fn expect_commit(iter: &mut Lines) -> Option<Commit> {
 
     let (author, email) = author_email.split_at(author_email.find(" <").unwrap());
 
-    let author_match = AUTHOR_REGEX.captures(author).unwrap()[1].to_string();
-    let email_match = EMAIL_REGEX.captures(email.trim()).unwrap()[1].to_string();
+    let author_match = AUTHOR_REGEX
+        .captures(author)
+        .and_then(|x| x.get(1))
+        .map(|x| x.to_owned().as_str().to_string())
+        .unwrap_or(String::from("unknown"));
+    let email_match = EMAIL_REGEX
+        .captures(email.trim())
+        .and_then(|x| x.get(1))
+        .map(|x| x.to_owned().as_str().to_string())
+        .unwrap_or(String::from("unknown"));
     let date_match = DATE_REGEX.captures(date).unwrap()[1]
         .to_string()
         .parse::<i64>()
