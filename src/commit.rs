@@ -1,7 +1,16 @@
+use charming::{
+    component::{Axis, DataZoom},
+    element::{AreaStyle, AxisType},
+    series::Line,
+    Chart, HtmlRenderer,
+};
 use once_cell::sync::Lazy;
 use regex::Regex;
 use std::{collections::HashMap, process::Command, str::Lines};
-use time::OffsetDateTime;
+use time::{
+    format_description::{self, BorrowedFormatItem},
+    OffsetDateTime,
+};
 
 use crate::data::{Author, Commit};
 
@@ -98,18 +107,35 @@ pub fn print_commit(commits: Vec<Commit>, author: Option<String>) {
     }
 }
 
-pub fn print_commit_data(commits: Vec<Commit>, author: Option<String>) {
+pub fn plot_commit(commits: Vec<Commit>, author: Option<String>) {
+    static TIME_FORMAT: Lazy<Vec<BorrowedFormatItem<'_>>> =
+        Lazy::new(|| format_description::parse("[year]/[month]/[day]T00:00:00").unwrap());
     // don't fully understand this part
     let shown_commits: Box<dyn Iterator<Item = &Commit>> = author
         .map_or(Box::new(commits.iter()), |name| {
             Box::new(commits.iter().filter(move |c| c.author.name.eq(&name)))
         });
 
-    for c in shown_commits {
-        let commit = c.to_owned();
-        println!(
-            "{},{},{}",
-            commit.time, commit.author.name, commit.author.email
-        );
+    // for real?
+    let mut temp: Vec<_> = shown_commits
+        .map(|c| (c.time.format(&TIME_FORMAT).unwrap(), 1))
+        .collect::<Vec<_>>();
+    temp.sort_unstable();
+    let data: Vec<_> = temp
+        .chunk_by(|x, y| x.0 == y.0)
+        .map(|xs| vec![xs[0].0.clone(), xs.len().to_string()])
+        .collect();
+
+    for d in data.iter() {
+        println!("{}, {}", d[0], d[1]);
     }
+
+    let chart = Chart::new()
+        .x_axis(Axis::new().type_(AxisType::Time))
+        .y_axis(Axis::new().type_(AxisType::Value))
+        .series(Line::new().area_style(AreaStyle::new()).data(data))
+        .data_zoom(DataZoom::new().brush_select(true));
+
+    let mut renderer = HtmlRenderer::new("commits", 1440, 512).theme(charming::theme::Theme::Dark);
+    renderer.save(&chart, "commits.html").unwrap();
 }

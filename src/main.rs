@@ -3,9 +3,9 @@ mod data;
 mod file;
 mod stat;
 
-use crate::commit::{get_commits, print_commit, print_commit_data};
+use crate::commit::{get_commits, plot_commit, print_commit};
 use crate::file::get_file_stats;
-use crate::stat::{get_stats, print_stats, print_stats_data};
+use crate::stat::{get_stats, plot_stats, print_stats};
 use clap::Parser;
 use std::path::PathBuf;
 
@@ -24,9 +24,9 @@ struct Cli {
     #[arg(short, long)]
     commits: bool,
 
-    /// Outputs data to be plotted by gnuplot
+    /// Visualize contributions with a graph
     #[arg(short, long)]
-    gnuplot: bool,
+    plot: bool,
 
     /// Show insertions and deletions on single file
     #[arg(short, long, value_delimiter = ' ', num_args = 1.., value_name = "FILE")]
@@ -38,15 +38,15 @@ fn main() {
 
     if args.commits {
         let commits = get_commits().expect("git log parse failed");
-        if args.gnuplot {
-            print_commit_data(commits, args.author);
+        if args.plot {
+            plot_commit(commits, args.author);
         } else {
             print_commit(commits, args.author);
         }
     } else if args.stat {
         let stats = get_stats().expect("git log parse failed");
-        if args.gnuplot {
-            print_stats_data(stats, args.author);
+        if args.plot {
+            plot_stats(stats, args.author);
         } else {
             print_stats(stats, args.author);
         }
@@ -62,8 +62,8 @@ fn main() {
             stats.append(&mut single);
         }
 
-        if args.gnuplot {
-            print_stats_data(stats, args.author);
+        if args.plot {
+            plot_stats(stats, args.author);
         } else {
             print_stats(stats, args.author);
         }

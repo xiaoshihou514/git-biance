@@ -103,6 +103,6 @@ pub fn print_stats(stats: Vec<DetailedCommit>, author: Option<String>) {
     }
 }
 
-pub fn print_stats_data(stats: Vec<DetailedCommit>, author: Option<String>) {
+pub fn plot_stats(stats: Vec<DetailedCommit>, author: Option<String>) {
     todo!();
 }

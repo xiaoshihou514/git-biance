@@ -4,7 +4,8 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+charming = "0.4.0"
 clap = { version = "4.5.28", features = ["derive"] }
 once_cell = "1.20.3"
 regex = "1.11.1"
-time = "0.3.37"
+time = { version = "0.3.37", features = ["formatting"] }
