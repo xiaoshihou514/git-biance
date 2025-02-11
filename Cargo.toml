@@ -2,6 +2,13 @@
 name = "git-biance"
 version = "0.1.0"
 edition = "2021"
+license = "GPL-3.0"
+description = "A small program that shows and visualizes code contributions in a git repository."
+homepage = "https://github.com/xiaoshihou514/git-biance"
+repository = "https://github.com/xiaoshihou514/git-biance"
+keywords = ["git", "cli", "terminal"]
+categories = ["command-line-utilities"]
+readme = "README.md"
 
 [dependencies]
 charming = "0.4.0"
