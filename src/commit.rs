@@ -1,7 +1,7 @@
 use charming::{
     component::{Axis, DataZoom},
-    element::{AreaStyle, AxisType},
-    series::Line,
+    element::{AxisType, ItemStyle},
+    series::Bar,
     Chart, HtmlRenderer,
 };
 use once_cell::sync::Lazy;
@@ -126,14 +126,14 @@ pub fn plot_commit(commits: Vec<Commit>, author: Option<String>) {
         .map(|xs| vec![xs[0].0.clone(), xs.len().to_string()])
         .collect();
 
-    for d in data.iter() {
-        println!("{}, {}", d[0], d[1]);
-    }
-
     let chart = Chart::new()
         .x_axis(Axis::new().type_(AxisType::Time))
         .y_axis(Axis::new().type_(AxisType::Value))
-        .series(Line::new().area_style(AreaStyle::new()).data(data))
+        .series(
+            Bar::new()
+                .data(data)
+                .item_style(ItemStyle::new().color("#0475FF")),
+        )
         .data_zoom(DataZoom::new().brush_select(true));
 
     let mut renderer = HtmlRenderer::new("commits", 1440, 512).theme(charming::theme::Theme::Dark);

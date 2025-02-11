@@ -1,7 +1,14 @@
+use charming::{
+    component::{Axis, DataZoom},
+    element::{AxisType, ItemStyle},
+    series::Bar,
+    Chart, HtmlRenderer,
+};
 use std::{collections::HashMap, process::Command, str::Lines};
 
 use once_cell::sync::Lazy;
 use regex::Regex;
+use time::format_description::{self, BorrowedFormatItem};
 
 use crate::{
     commit::expect_commit,
@@ -104,5 +111,63 @@ pub fn print_stats(stats: Vec<DetailedCommit>, author: Option<String>) {
 }
 
 pub fn plot_stats(stats: Vec<DetailedCommit>, author: Option<String>) {
-    todo!();
+    static TIME_FORMAT: Lazy<Vec<BorrowedFormatItem<'_>>> =
+        Lazy::new(|| format_description::parse("[year]/[month]/[day]T00:00:00").unwrap());
+    // don't fully understand this part
+    let shown_commits: Box<dyn Iterator<Item = &DetailedCommit>> =
+        author.map_or(Box::new(stats.iter()), |name| {
+            Box::new(
+                stats
+                    .iter()
+                    .filter(move |dc| dc.commit.author.name.eq(&name)),
+            )
+        });
+
+    // for real?
+    let mut temp: Vec<_> = shown_commits
+        .map(|dc| {
+            (
+                dc.commit.time.format(&TIME_FORMAT).unwrap(),
+                dc.insertions,
+                dc.deletions,
+            )
+        })
+        .collect::<Vec<_>>();
+    temp.sort_unstable();
+    let insertions: Vec<_> = temp
+        .chunk_by(|x, y| x.0 == y.0)
+        .map(|xs| {
+            vec![
+                xs[0].0.clone(),
+                xs.into_iter().fold(0, |acc, x| acc + x.1).to_string(),
+            ]
+        })
+        .collect();
+    let deletions: Vec<_> = temp
+        .chunk_by(|x, y| x.0 == y.0)
+        .map(|xs| {
+            vec![
+                xs[0].0.clone(),
+                xs.into_iter().fold(0, |acc, x| acc + x.2).to_string(),
+            ]
+        })
+        .collect();
+
+    let chart = Chart::new()
+        .x_axis(Axis::new().type_(AxisType::Time))
+        .y_axis(Axis::new().type_(AxisType::Value))
+        .series(
+            Bar::new()
+                .data(insertions)
+                .item_style(ItemStyle::new().color("#3D6C46")),
+        )
+        .series(
+            Bar::new()
+                .data(deletions)
+                .item_style(ItemStyle::new().color("#E2524A")),
+        )
+        .data_zoom(DataZoom::new().brush_select(true));
+
+    let mut renderer = HtmlRenderer::new("commits", 1440, 512).theme(charming::theme::Theme::Dark);
+    renderer.save(&chart, "stats.html").unwrap();
 }
