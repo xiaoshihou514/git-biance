@@ -22,7 +22,7 @@ pub fn get_file_stats(path: String) -> Option<Vec<DetailedCommit>> {
     static COMMIT_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r"^commit [a-f0-9]{40}$").unwrap());
 
     let output = String::from_utf8(output.stdout).ok()?;
-    let mut iter = output.lines().into_iter();
+    let mut iter = output.lines();
     let mut commits: Vec<DetailedCommit> = vec![];
 
     while let Some(line) = iter.next() {
@@ -34,5 +34,5 @@ pub fn get_file_stats(path: String) -> Option<Vec<DetailedCommit>> {
         }
     }
 
-    return Some(commits);
+    Some(commits)
 }

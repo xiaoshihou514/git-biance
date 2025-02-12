@@ -28,7 +28,7 @@ pub fn get_commits() -> Option<Vec<Commit>> {
     static COMMIT_REGEX: Lazy<Regex> = Lazy::new(|| Regex::new(r"^commit [a-f0-9]{40}$").unwrap());
 
     let output = String::from_utf8(output.stdout).ok()?;
-    let mut iter = output.lines().into_iter();
+    let mut iter = output.lines();
     let mut commits: Vec<Commit> = vec![];
 
     while let Some(line) = iter.next() {
@@ -40,7 +40,7 @@ pub fn get_commits() -> Option<Vec<Commit>> {
         }
     }
 
-    return Some(commits);
+    Some(commits)
 }
 
 pub fn expect_commit(iter: &mut Lines) -> Option<Commit> {
@@ -75,13 +75,13 @@ pub fn expect_commit(iter: &mut Lines) -> Option<Commit> {
         .parse::<i64>()
         .unwrap();
 
-    return Some(Commit {
+    Some(Commit {
         author: Author {
             name: author_match,
             email: email_match,
         },
         time: OffsetDateTime::from_unix_timestamp(date_match).unwrap(),
-    });
+    })
 }
 
 pub fn print_commit(commits: Vec<Commit>, author: Option<String>) {
@@ -93,12 +93,10 @@ pub fn print_commit(commits: Vec<Commit>, author: Option<String>) {
         stats.insert(author, count);
     }
     let stats_sorted: Vec<(&Author, &i64)> = match author {
-        Some(a) => Vec::from(
-            stats
-                .iter()
-                .filter(|x| x.to_owned().0.to_owned().name.eq(&a))
-                .collect::<Vec<_>>(),
-        ),
+        Some(a) => stats
+            .iter()
+            .filter(|x| x.to_owned().0.to_owned().name.eq(&a))
+            .collect::<Vec<_>>(),
         None => {
             let mut stats = Vec::from_iter(stats.iter());
             stats.sort_by(|a1, a2| a2.1.cmp(a1.1));
