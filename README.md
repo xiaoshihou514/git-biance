@@ -4,7 +4,7 @@ biance（鞭策，biān cè，spur）is a small rust program that shows and visu
 
 <div align="center">⚠️*Do not* use it to harass your teammates⚠️</div>
 
-|                                `git biance --commit --plot`                                 |                                `git biance --stat --plot`                                 |
+|                                `git biance --commits --plot`                                 |                                `git biance --stat --plot`                                 |
 | :-----------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------: |
 | ![commits](https://github.com/user-attachments/assets/6fdcb9cd-44aa-4918-b8dd-6d3a27b850bd) | ![stats](https://github.com/user-attachments/assets/23c69509-fd12-42bc-8b46-9aa9ffe08543) |
 
