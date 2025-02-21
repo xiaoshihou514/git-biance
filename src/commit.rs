@@ -6,7 +6,7 @@ use charming::{
 };
 use once_cell::sync::Lazy;
 use regex::Regex;
-use std::{collections::HashMap, process::Command, str::Lines};
+use std::{collections::HashMap, io::IsTerminal, process::Command, str::Lines};
 use time::{
     format_description::{self, BorrowedFormatItem},
     OffsetDateTime,
@@ -104,12 +104,17 @@ pub fn print_commit(commits: Vec<Commit>, author: Option<String>) {
         }
     };
 
+    let color = std::io::stdout().is_terminal();
     println!("{0: <30} | {1: <30}", "Author", "Commits");
     for (author, commit_count) in stats_sorted {
-        println!(
-            "{0: <30} | \u{1B}[94m{1: <30}\u{1B}[0m",
-            author.name, commit_count
-        );
+        if color {
+            println!(
+                "{0: <30} | \u{1B}[94m{1: <30}\u{1B}[0m",
+                author.name, commit_count
+            );
+        } else {
+            println!("{0: <30} | {1: <30}", author.name, commit_count);
+        }
     }
 }
 

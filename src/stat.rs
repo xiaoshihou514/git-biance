@@ -4,7 +4,7 @@ use charming::{
     series::Bar,
     Chart, HtmlRenderer,
 };
-use std::{collections::HashMap, process::Command, str::Lines};
+use std::{collections::HashMap, io::IsTerminal, process::Command, str::Lines};
 
 use once_cell::sync::Lazy;
 use regex::Regex;
@@ -98,13 +98,23 @@ pub fn print_stats(stats: Vec<DetailedCommit>, author: Option<String>) {
         "{0: <30} | {1: <12} | {2: <12}",
         "Author", "Insertions", "Deletions"
     );
+    let color = std::io::stdout().is_terminal();
     for (author, (insertions, deletions)) in stats_sorted {
-        println!(
-            "{0: <30} | \u{1B}[92m{1: <12}\u{1B}[0m | \u{1B}[31m{2: <12}\u{1B}[0m",
-            author.name,
-            insertions.to_string() + "+",
-            deletions.to_string() + "-",
-        );
+        if color {
+            println!(
+                "{0: <30} | \u{1B}[92m{1: <12}\u{1B}[0m | \u{1B}[31m{2: <12}\u{1B}[0m",
+                author.name,
+                insertions.to_string() + "+",
+                deletions.to_string() + "-",
+            );
+        } else {
+            println!(
+                "{0: <30} | {1: <12} | {2: <12}",
+                author.name,
+                insertions.to_string() + "+",
+                deletions.to_string() + "-",
+            );
+        }
     }
 }
 
