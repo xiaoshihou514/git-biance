@@ -1,5 +1,7 @@
 # git-biance
 
+![Crates.io Version](https://img.shields.io/crates/v/git-biance)
+
 [中文文档](./README-zh.md)
 
 biance（鞭策，biān cè，spur）is a small rust program that shows and visualizes code contributions in a git repository.
