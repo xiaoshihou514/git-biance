@@ -2,7 +2,7 @@
 
 git-鞭策是一个用rust写的，用来可视化队友干了多少活的小程序。
 
-<div align="center">⚠️请*不要*用这个来压力队友⚠️</div>
+<div align="center">⚠️请*不要*用这个来压力同事，开开玩笑就得了⚠️</div>
 
 |                                `git biance --commits --plot`                                |                                `git biance --stat --plot`                                 |
 | :-----------------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------------: |
@@ -30,6 +30,29 @@ Options:
   -h, --help            Print help
   -V, --version         Print version
 ```
+
+## 集成
+
+### GitLab集成
+
+用以下流程可以实现合并请求中自动鞭策的效果，需要成员添加名为CI_AUTOCOMMENTER_API_KEY的变量，值为个人授权码：
+
+```yaml
+# 别忘了把gitlab示例的链接改了
+biance:
+  stage: deploy
+  variables:
+    GIT_DEPTH: 0
+  script:
+    - BIANCE_COMMIT=$(git biance -c | sed ':a; N; $!ba; s/ /%20/g; s/\n/%0A/g')
+    - BIANCE_STATS=$(find src/main/ -type f | xargs git biance -f | sed ':a; N; $!ba; s/ /%20/g; s/\n/%0A/g')
+    - BIANCE_MSG=$(echo "Beep%20boop%0A%0A$BIANCE_COMMIT%0A%0A$BIANCE_STATS")
+    - 'curl --request POST --header "PRIVATE-TOKEN: $CI_AUTOCOMMENTER_API_KEY" "https://your.gitlab.instance.com/api/v4/projects/$CI_PROJECT_ID/merge_requests/$CI_MERGE_REQUEST_IID/notes?body=$BIANCE_MSG"'
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+```
+
+![效果](https://github.com/user-attachments/assets/ea9ae5a6-d51d-441d-9cc0-f484f34ad614)
 
 ## 常见问题
 
