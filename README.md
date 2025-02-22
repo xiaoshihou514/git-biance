@@ -1,5 +1,3 @@
-# git-biance
-
 ![Crates.io Version](https://img.shields.io/crates/v/git-biance)
 
 [中文文档](./README-zh.md)

@@ -1,5 +1,3 @@
-# git鞭策
-
 ![版本](https://img.shields.io/crates/v/git-biance)
 
 git-鞭策是一个用rust写的，用来可视化队友干了多少活的小程序。
