@@ -176,6 +176,6 @@ pub fn plot_stats(stats: Vec<DetailedCommit>, author: Option<String>) {
         )
         .data_zoom(DataZoom::new().brush_select(true));
 
-    let mut renderer = HtmlRenderer::new("commits", 1440, 512).theme(charming::theme::Theme::Dark);
+    let mut renderer = HtmlRenderer::new("stats", 1440, 512).theme(charming::theme::Theme::Dark);
     renderer.save(&chart, "stats.html").unwrap();
 }
