@@ -10,6 +10,15 @@ git-鞭策是一个用rust写的，用来可视化队友干了多少活的小程
 
 ## 安装
 
+### Fedora
+
+```shell
+sudo dnf install --nogpgcheck --repofrompath 'terra,https://repos.fyralabs.com/terra$releasever' terra-release
+sudo dnf install git-biance
+```
+
+### 其他
+
 ```shell
 cargo install git-biance
 ```

@@ -12,6 +12,15 @@ biance（鞭策，biān cè，spur）is a small rust program that shows and visu
 
 ## Installation
 
+### Fedora
+
+```shell
+sudo dnf install --nogpgcheck --repofrompath 'terra,https://repos.fyralabs.com/terra$releasever' terra-release
+sudo dnf install git-biance
+```
+
+### Other
+
 ```shell
 cargo install git-biance
 ```
