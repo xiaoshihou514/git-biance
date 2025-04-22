@@ -1,0 +1,14 @@
+[
+  {
+    "name": "codeberg",
+    "url": "ssh://git@codeberg.org/xiaoshihou/git-biance.git"
+  },
+  {
+    "name": "sourcehut",
+    "url": "git@git.sr.ht:~xiaoshihou/git-biance"
+  },
+  {
+    "name": "gitlab",
+    "url": "git@gitlab.com:xiaoshihou/git-biance.git"
+  }
+]
